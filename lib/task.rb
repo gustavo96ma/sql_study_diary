@@ -2,7 +2,7 @@ require 'sqlite3'
 
 class Task
 
-  attr_accessor :title, :category, :descript, :done
+  attr_accessor :id, :title, :category, :descript, :done
   
   def initialize(title:, category:, descript:, done: "Não")
     @title = title
@@ -14,16 +14,16 @@ class Task
   def self.all
     db = SQLite3::Database.open "../db/database.db"
     db.results_as_hash = true
-    tasks = db.execute "SELECT title, category, descript, done FROM tasks where done LIKE'Não'"
+    tasks = db.execute "SELECT id, title, category, descript, done FROM tasks where done LIKE'Não'"
     db.close
     tasks.map { |task| new(title: task['title'], category: task['category'], descript: task['descript'], done: task['done']) }
-    print "\nLEGENDA -- Título - Categoria - Descrição - Concluído\n"
-    tasks.each { |task| print "\n#{task['title']} - #{task['category']} - #{task['descript']} - #{task['done']}\n"}
+    print "\nLEGENDA -- ID - Título - Categoria - Descrição - Concluído\n"
+    tasks.each { |task| print "\n#{task['id']} - #{task['title']} - #{task['category']} - #{task['descript']} - #{task['done']}\n"}
   end
 
   def save_to_db
     db = SQLite3::Database.open "../db/database.db"
-    db.execute "INSERT INTO tasks VALUES('#{ title }', '#{ category }', '#{ descript }', '#{ done }')"
+    db.execute "INSERT INTO tasks (title, category, descript, done) VALUES ('#{ title }', '#{ category }', '#{ descript }', '#{ done }')"
     db.close
     self
   end
@@ -31,14 +31,14 @@ class Task
   def self.find_by_title(title)
     db = SQLite3::Database.open "../db/database.db"
     db.results_as_hash = true
-    tasks = db.execute "SELECT title, category, descript, done FROM tasks where (title LIKE'%#{title}%' OR descript LIKE'%#{title}%') AND done LIKE'Não'"
+    tasks = db.execute "SELECT id, title, category, descript, done FROM tasks where (title LIKE'%#{title}%' OR descript LIKE'%#{title}%') AND done LIKE'Não'"
     db.close
     tasks.map {|task| new(title: task['title'], category: task['category'], descript: task['descript'], done: task['done']) }
     if tasks.length == 0
       return print "\nNão foi encontrado nenhum item.\n"
     else
       print "\nResultado da busca:\n"
-      tasks.each { |task| print "\n#{task['title']} - #{task['category']} - #{task['descript']} - #{task['done']}\n"}
+      tasks.each { |task| print "\n#{task['id']} - #{task['title']} - #{task['category']} - #{task['descript']} - #{task['done']}\n"}
     end
   end
 
@@ -74,10 +74,10 @@ class Task
   def self.find_done
     db = SQLite3::Database.open "../db/database.db"
     db.results_as_hash = true
-    tasks = db.execute "SELECT title, category, descript, done FROM tasks where done LIKE'Sim'"
+    tasks = db.execute "SELECT id, title, category, descript, done FROM tasks where done LIKE'Sim'"
     db.close
     tasks.map {|task| new(title: task['title'], category: task['category'], descript: task['descript'], done: task['done']) }
     print "\nOs itens marcados como concluídos são:\n"
-    tasks.each { |task| print "\n#{task['title']} - #{task['category']} - #{task['descript']} - #{task['done']}\n"}
+    tasks.each { |task| print "\n#{task['id']} - #{task['title']} - #{task['category']} - #{task['descript']} - #{task['done']}\n"}
   end
 end
